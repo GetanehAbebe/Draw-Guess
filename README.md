@@ -23,7 +23,7 @@
     - Run command 'npm run dev'
   
   #Me:
-    - I would like to get feebacks, suggestions and other comments, so if you have something please write,
+    - I would like to get feedbacks, suggestions and other comments, so if you have something please write,
       I learn from thos feedbacks.
       
  # Thanks,Getaneh.
