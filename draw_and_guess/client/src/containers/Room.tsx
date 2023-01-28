@@ -44,7 +44,14 @@ const Room = () => {
 
     socket.on(
       EVENTS.SERVER.ROOM_MESSAGE,
-      ({ roomId, content, username, contentType, sendTime }: Message) => {
+      ({
+        roomId,
+        content,
+        username,
+        contentType,
+        sendTime,
+        messageId,
+      }: Message) => {
         const date = new Date();
         const receiveTime = `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`;
         dispatch(
@@ -55,7 +62,7 @@ const Room = () => {
             contentType,
             sendTime,
             receiveTime,
-            messageId: "",
+            messageId,
           })
         );
       }
