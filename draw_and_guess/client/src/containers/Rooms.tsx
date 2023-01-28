@@ -66,7 +66,7 @@ function RoomsContainer() {
       </div>
 
       <ul>
-        {Object.keys(rooms).length &&
+        {Object.keys(rooms) &&
           Object.keys(rooms).map((key) => {
             return (
               <div key={key}>

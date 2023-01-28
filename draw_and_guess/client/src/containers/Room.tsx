@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { rooms, setRoomId, setRooms, socketContext } from "../app/gamesSlice";
 import Canvas from "../components/CanvasContext";
 import { roomId } from "../app/gamesSlice";
-import GameStart from "../components/GameStart";
+import GameStarter from "../components/GameStarter";
 import EVENTS from "../config/events";
 import { addMessage } from "../app/gamesSlice";
 import { Message } from "../utils/interfaces";
@@ -98,7 +98,7 @@ const Room = () => {
       {!messages && (
         <button onClick={() => setShowForm(!showForm)}>Create new Task</button>
       )}
-      {!showForm && <GameStart />}
+      {!showForm && <GameStarter />}
       {messages.length === 0 ? (
         <Canvas />
       ) : messages.length === 1 ? (
