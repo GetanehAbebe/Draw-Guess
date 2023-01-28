@@ -1,39 +1,33 @@
-
 import styles from "./styles/Home.module.css";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import RoomsContainer from "./containers/Rooms";
 import { useEffect, useState } from "react";
 import { setUserId, setUsername, userId, username } from "./app/gamesSlice";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useRoutes,
-} from "react-router-dom";
 import Room from "./containers/Room";
 import Rooms from "./containers/Rooms";
-
+import { BrowserRouter as Router, useRoutes } from "react-router-dom";
 
 function Home() {
   const dispatch = useAppDispatch();
-  const playerName = useAppSelector(username)
-  const playerId = useAppSelector(userId)
-  const [localUsername, setLocalUsername] = useState(localStorage.getItem("username"))
+  const playerName = useAppSelector(username);
+  const playerId = useAppSelector(userId);
+  const [localUsername, setLocalUsername] = useState(
+    localStorage.getItem("username")
+  );
+
   function handleSetUsername() {
     dispatch(setUsername(localUsername));
     if (!playerId) {
-      const id = uuidv4()
-      dispatch(setUserId(id))
+      const id = uuidv4();
+      dispatch(setUserId(id));
     }
-  
   }
 
   useEffect(() => {
     if (playerName && !playerId) {
-      const id = uuidv4()
-      dispatch(setUserId(id))
-
+      const id = uuidv4();
+      dispatch(setUserId(id));
     }
   }, []);
 
@@ -42,7 +36,12 @@ function Home() {
       {!playerName && (
         <div className={styles.usernameWrapper}>
           <div className={styles.usernameInner}>
-            <input placeholder="Username" onChange={(e) => { setLocalUsername(e.target.value) }} />
+            <input
+              placeholder="Username"
+              onChange={(e) => {
+                setLocalUsername(e.target.value);
+              }}
+            />
             <button className="cta" onClick={handleSetUsername}>
               START
             </button>
@@ -59,12 +58,12 @@ function Home() {
 }
 const App = () => {
   const routes = useRoutes([
-    { path: '/room', element: <Room /> },
-    { path: '/home', element: <Rooms /> },
-    { path: '/', element: <Home /> }
-  ])
-  return routes
-}
+    { path: "/room/:id", element: <Room /> },
+    { path: "/home", element: <Rooms /> },
+    { path: "/", element: <Home /> },
+  ]);
+  return routes;
+};
 
 const AppWrapper = () => {
   return (
@@ -74,4 +73,4 @@ const AppWrapper = () => {
   );
 };
 
-export default AppWrapper
+export default AppWrapper;

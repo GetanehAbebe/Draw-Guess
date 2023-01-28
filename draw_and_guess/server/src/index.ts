@@ -15,11 +15,9 @@ const io = new Server(httpServer, {
   },
 });
 
-app.get("/", (_, res) =>
-  res.send(`Server is up and running version `)
-);
+app.get("/", (_, res) => res.send(`Server is up and running version `));
 
 httpServer.listen(SERVER_PORT, +SERVER_HOST, () => {
-    console.log(`server started on port ${SERVER_PORT}`, )
+  console.log(`server started on port ${SERVER_PORT}`);
   socket({ io });
 });

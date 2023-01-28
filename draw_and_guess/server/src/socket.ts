@@ -1,6 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { Server, Socket } from "socket.io";
-
+interface Message {
+  content: string;
+  date: string;
+  author: string;
+}
 const EVENTS = {
   connection: "connection",
   CLIENT: {
@@ -15,7 +19,10 @@ const EVENTS = {
   },
 };
 
-const rooms: Record<string, { name: string }> = {};
+const rooms: Record<
+  string,
+  { name: string; messages: Message[]; roomId: string }
+> = {};
 
 function socket({ io }: { io: Server }) {
   console.info(`Sockets enabled`);
@@ -24,19 +31,21 @@ function socket({ io }: { io: Server }) {
     console.info(`User connected ${socket.id}`);
 
     socket.emit(EVENTS.SERVER.ROOMS, rooms);
-    socket.on("send_message", data=>{
-        socket.broadcast.emit("recieve_message", data)
-    })
+    socket.on("send_message", (data) => {
+      socket.broadcast.emit("recieve_message", data);
+    });
     /*
      * When a user creates a new room
      */
     socket.on(EVENTS.CLIENT.CREATE_ROOM, ({ roomName }) => {
-      console.log('room created',  roomName );
+      console.log("room created", roomName);
       // create a roomId
       const roomId = uuidv4();
       // add a new room to the rooms object
       rooms[roomId] = {
         name: roomName,
+        messages: [],
+        roomId,
       };
 
       socket.join(roomId);
@@ -50,19 +59,18 @@ function socket({ io }: { io: Server }) {
       socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
     });
 
-    /*
-     * When a user sends a room message
-     */
-
     socket.on(
       EVENTS.CLIENT.SEND_ROOM_MESSAGE,
-      ({ roomId, message, username }) => {
+      ({ roomId, content, contentType, username }) => {
         const date = new Date();
 
         socket.to(roomId).emit(EVENTS.SERVER.ROOM_MESSAGE, {
-          message,
+          roomId,
+          content,
+          contentType,
           username,
-          time: `${date.getHours()}:${date.getMinutes()}`,
+          messageId: uuidv4(),
+          sendTime: `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`,
         });
       }
     );

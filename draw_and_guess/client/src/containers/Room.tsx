@@ -1,57 +1,128 @@
-import React, { useState } from 'react'
-import { useAppSelector } from '../app/hooks'
-import { rooms } from '../app/gamesSlice'
-import Canvas from '../components/CanvasContext'
-import { roomId } from '../app/gamesSlice'
-import GameStart from '../components/GameStart'
-interface Message {
-    content: string,
-    author: string,
-    date: string
-}
-interface RoomProps {
-    members?: string[],
-    roomId: string,
-    messages?: Message[] | []
-}
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { rooms, setRoomId, setRooms, socketContext } from "../app/gamesSlice";
+import Canvas from "../components/CanvasContext";
+import { roomId } from "../app/gamesSlice";
+import GameStart from "../components/GameStart";
+import EVENTS from "../config/events";
+import { addMessage } from "../app/gamesSlice";
+import { Message } from "../utils/interfaces";
+import { useParams } from "react-router-dom";
 
 const WordGuess = ({ handleChange, value, img }: any) => {
-    return <label htmlFor="wordGuess">
-        <div>
-            <img src={img} alt="" />
-        </div>
-        <input type="text" value={value} onChange={handleChange} />
+  return (
+    <label htmlFor="wordGuess">
+      <div>
+        <img src={img} alt="" />
+      </div>
+      <input type="text" value={value} onChange={handleChange} />
     </label>
-}
+  );
+};
 
 const Room = () => {
-    const [word, setWord] = useState("")
+  const { id } = useParams();
+  const [word, setWord] = useState("");
+  const dispatch = useAppDispatch();
+  const [showForm, setShowForm] = useState(false);
+  const socket = useAppSelector(socketContext);
+  const [currentRoom, setCurrentRoom] = useState(useAppSelector(roomId));
+  const allRooms = useAppSelector(rooms);
+  const [messages, setMeesages] = useState<Message[]>([]);
 
-    const [showForm, setShowForm] = useState(false)
-    const currentRoom = useAppSelector(roomId)
-    const roomsWithMessages = useAppSelector(rooms)
+  useEffect(() => {
+    socket.emit(EVENTS.CLIENT.JOIN_ROOM, currentRoom);
+
     if (!currentRoom) {
-        return null
+      setCurrentRoom(id);
     }
-    const messages = roomsWithMessages[currentRoom] ? roomsWithMessages[currentRoom].messages : []
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("word", word)
-        setWord(e.target.value)
-
-
+  }, []);
+  useEffect(() => {
+    if (currentRoom && allRooms) {
+      setMeesages(allRooms[currentRoom].messages);
     }
 
-    return (
-        <div>
-            {!messages && <button onClick={() => setShowForm(!showForm)}>Create new Task</button>}
-            {!showForm && <GameStart />}
-            {messages && messages.length === 0 ? <Canvas /> : messages && messages.length === 1 ? <WordGuess handleChange={handleChange} value={word} img={messages[0].content} /> : <div>There is no nothing</div>}
-            {messages && messages.map((message: Message, index: number) => {
-                return <div key={message.content + index}>{message.content}</div>
-            })}
-        </div>
-    )
-}
+    socket.on(
+      EVENTS.SERVER.ROOM_MESSAGE,
+      ({ roomId, content, username, contentType, sendTime }: Message) => {
+        const date = new Date();
+        const receiveTime = `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`;
+        dispatch(
+          addMessage({
+            roomId,
+            content,
+            username,
+            contentType,
+            sendTime,
+            receiveTime,
+            messageId: "",
+          })
+        );
+      }
+    );
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("pong");
+    };
+  }, [socket]);
 
-export default Room
+  const updateRooms = (data: any) => {
+    dispatch(setRooms(data));
+  };
+
+  const updateRoomId = (id: string) => {
+    dispatch(setRoomId(roomId));
+  };
+  useEffect(() => {
+    socket.on(EVENTS.SERVER.ROOMS, (data: any) => {
+      updateRooms(data);
+    });
+    socket.on(EVENTS.SERVER.JOINED_ROOM, (roomId: string) => {
+      updateRoomId(roomId);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("pong");
+    };
+  }, [socket]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setWord(e.target.value);
+  };
+
+  return (
+    <div>
+      {!messages && (
+        <button onClick={() => setShowForm(!showForm)}>Create new Task</button>
+      )}
+      {!showForm && <GameStart />}
+      {messages.length === 0 ? (
+        <Canvas />
+      ) : messages.length === 1 ? (
+        <WordGuess
+          handleChange={handleChange}
+          value={word}
+          img={messages[0].content}
+        />
+      ) : null}
+
+      {messages.map(
+        ({ contentType, content, sendTime, receiveTime, messageId }: Message) =>
+          contentType === "image" ? (
+            <div>
+              <img src={content} key={messageId} alt={contentType} />
+              <div>send time: {sendTime}</div>
+              <div>receiv time: {receiveTime}</div>
+            </div>
+          ) : (
+            <div></div>
+          )
+      )}
+    </div>
+  );
+};
+
+export default Room;
