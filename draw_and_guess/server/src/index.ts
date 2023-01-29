@@ -10,7 +10,7 @@ const httpServer = createServer(app);
 
 app.use(
   cors({
-    origin: "*",
+    origin: ["https://draw-guess-brown.vercel.app"],
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
