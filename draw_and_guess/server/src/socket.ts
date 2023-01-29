@@ -11,17 +11,20 @@ const EVENTS = {
     CREATE_ROOM: "CREATE_ROOM",
     SEND_ROOM_MESSAGE: "SEND_ROOM_MESSAGE",
     JOIN_ROOM: "JOIN_ROOM",
+    SEND_GUESS: "SEND_GUESS",
   },
   SERVER: {
     ROOMS: "ROOMS",
     JOINED_ROOM: "JOINED_ROOM",
     ROOM_MESSAGE: "ROOM_MESSAGE",
+    BAD_GUESS: "BAD_GUESS",
+    RIGHT_GUESS: "RIGHT_GUESS",
   },
 };
 
 const rooms: Record<
   string,
-  { name: string; messages: Message[]; roomId: string }
+  { name: string; messages: Message[]; roomId: string; word: string }
 > = {};
 
 function socket({ io }: { io: Server }) {
@@ -38,7 +41,6 @@ function socket({ io }: { io: Server }) {
      * When a user creates a new room
      */
     socket.on(EVENTS.CLIENT.CREATE_ROOM, ({ roomName }) => {
-      console.log("room created", roomName);
       // create a roomId
       const roomId = uuidv4();
       // add a new room to the rooms object
@@ -46,6 +48,7 @@ function socket({ io }: { io: Server }) {
         name: roomName,
         messages: [],
         roomId,
+        word: "",
       };
 
       socket.join(roomId);
@@ -61,16 +64,17 @@ function socket({ io }: { io: Server }) {
 
     socket.on(
       EVENTS.CLIENT.SEND_ROOM_MESSAGE,
-      ({ roomId, content, contentType, username }) => {
+      ({ roomId, content, contentType, username, word = "" }) => {
         const date = new Date();
-
-        socket.to(roomId).emit(EVENTS.SERVER.ROOM_MESSAGE, {
+        rooms[roomId].word = word;
+        socket.emit(EVENTS.SERVER.ROOM_MESSAGE, {
           roomId,
           content,
           contentType,
           username,
           messageId: uuidv4(),
           sendTime: `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`,
+          wordLength: word.length,
         });
       }
     );
@@ -82,6 +86,14 @@ function socket({ io }: { io: Server }) {
       socket.join(roomId);
 
       socket.emit(EVENTS.SERVER.JOINED_ROOM, roomId);
+    });
+
+    socket.on(EVENTS.CLIENT.SEND_GUESS, ({ roomId, word }: any) => {
+      if (rooms[roomId].word.toLocaleLowerCase() === word.toLocaleLowerCase()) {
+        socket.emit(EVENTS.SERVER.RIGHT_GUESS, { roomId });
+      } else {
+        socket.emit(EVENTS.SERVER.BAD_GUESS);
+      }
     });
   });
 }
