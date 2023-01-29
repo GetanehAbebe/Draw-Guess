@@ -14,7 +14,7 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
-app.use(cors());
+app.use(cors({ origin: "*", credentials: true }));
 app.get("/", (_, res) => res.send(`Server is up and running version `));
 
 httpServer.listen(SERVER_PORT, +SERVER_HOST, () => {
