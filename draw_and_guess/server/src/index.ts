@@ -8,12 +8,6 @@ const app = express();
 
 const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    credentials: true,
-  },
-});
 app.use(
   cors({
     origin: "*",
@@ -21,6 +15,14 @@ app.use(
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
 );
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "PUT", "POST", "DELETE"],
+  },
+});
 app.get("/", (_, res) => res.send(`Server is up and running version `));
 
 httpServer.listen(SERVER_PORT, +SERVER_HOST, () => {
