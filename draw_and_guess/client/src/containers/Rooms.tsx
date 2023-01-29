@@ -29,7 +29,34 @@ function RoomsContainer() {
     socket.on(EVENTS.SERVER.ROOMS, (data: any) => {
       dispatch(setRooms(data));
     });
-    
+
+    // socket.on(
+    //   EVENTS.SERVER.ROOM_MESSAGE,
+    //   ({
+    //     roomId,
+    //     content,
+    //     username,
+    //     contentType,
+    //     sendTime,
+    //     messageId,
+    //   }: Message) => {
+    //     const date = new Date();
+    //     console.log("messageId: ", messageId);
+    //     const receiveTime = `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`;
+    //     dispatch(
+    //       addMessage({
+    //         roomId,
+    //         content,
+    //         username,
+    //         contentType,
+    //         sendTime,
+    //         receiveTime,
+    //         messageId,
+    //       })
+    //     );
+    //   }
+    // );
+
     return () => {};
   }, []);
 
@@ -37,7 +64,6 @@ function RoomsContainer() {
     if (!String(roomName).trim()) return;
 
     socket.emit(EVENTS.CLIENT.CREATE_ROOM, { roomName, messages: [] });
-
     // set room name input to empty string
     if (roomName) {
       setRoomName("");
