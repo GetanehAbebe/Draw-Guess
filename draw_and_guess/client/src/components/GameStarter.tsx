@@ -1,18 +1,38 @@
 import { useCallback, useState } from "react";
 import randomWords from "random-words";
-const GameStarter = () => {
+const GameStarter = ({
+  onClick,
+  onWordGenerated,
+}: {
+  onClick: Function;
+  onWordGenerated: Function;
+}) => {
   const [word, setWord] = useState("");
   const [canChooseWord, setCanChooseWord] = useState(true);
 
+  const onStartButtonClicked = () => {
+    setCanChooseWord(false);
+    onClick();
+  };
+
   const fetchWord = useCallback(() => {
     const newWord = randomWords({ exactly: 1, join: "" });
+    onWordGenerated(newWord);
     setWord(newWord);
     return;
   }, []);
 
   return (
     <div>
-      <h1>{word}</h1>
+      {!word && <div>To Start the game, please generate word</div>}
+      {word && (
+        <div>
+          The Chosen Word is <h1>{word}</h1>
+        </div>
+      )}
+      {word && canChooseWord && (
+        <div>click on Start button to start drawing</div>
+      )}
       <div>
         {canChooseWord && (
           <button onClick={fetchWord}>
@@ -21,7 +41,7 @@ const GameStarter = () => {
         )}
       </div>
       {canChooseWord && word && (
-        <button onClick={() => setCanChooseWord(false)}>Start</button>
+        <button onClick={onStartButtonClicked}>Start</button>
       )}
     </div>
   );

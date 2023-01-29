@@ -8,40 +8,78 @@ import EVENTS from "../config/events";
 import { addMessage } from "../app/gamesSlice";
 import { Message } from "../utils/interfaces";
 import { useParams } from "react-router-dom";
+import Input from "../components/form/Input";
 
-const WordGuess = ({ handleChange, value, img }: any) => {
+const WordGuess = ({ img, wordLength }: any) => {
+  const socket = useAppSelector(socketContext);
+  const [guessedWord, setGuessedWord] = useState("");
+  const currentRoom = useState(useAppSelector(roomId));
+  const { id: currentRoomId } = useParams();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (wordLength >= e.target.value.length) {
+      setGuessedWord(e.target.value);
+    }
+
+    // TODO: find a way to alert for user
+    // else {
+    //   alert("Note: Your input's length is longer than Draw's word");
+    // }
+  };
+
+  // useEffect(() => {
+  //   socket.on(EVENTS.SERVER.RIGHT_GUESS, () => {
+  //     alert("right Guess");
+  //   });
+  //   socket.on(EVENTS.SERVER.BAD_GUESS, () => {
+  //     alert("Wrong Guess");
+  //   });
+  // }, [socket]);
+
   return (
-    <label htmlFor="wordGuess">
+    <div>
+      Please try guess this Draw.
+      <div>clue : The word Length is : {wordLength}</div>
       <div>
         <img src={img} alt="" />
       </div>
-      <input type="text" value={value} onChange={handleChange} />
-    </label>
+      <Input
+        onChange={handleChange}
+        name="Guess Word"
+        label="Guess Word "
+        type="text"
+        value={guessedWord}
+      />
+      <button
+        disabled={wordLength !== guessedWord.length}
+        onClick={() => {
+          socket.emit(EVENTS.CLIENT.SEND_GUESS, {
+            roomId: currentRoomId,
+            word: guessedWord,
+          });
+        }}
+      >
+        Guess
+      </button>
+    </div>
   );
 };
 
 const Room = () => {
   const { id } = useParams();
   const [word, setWord] = useState("");
+  const [showCanvas, setShowCanvas] = useState(false);
   const dispatch = useAppDispatch();
-  const [showForm, setShowForm] = useState(false);
   const socket = useAppSelector(socketContext);
-  const [currentRoom, setCurrentRoom] = useState(useAppSelector(roomId));
-  const allRooms = useAppSelector(rooms);
-  const [messages, setMeesages] = useState<Message[]>([]);
-
+  const stamMessages = useAppSelector(
+    (state) => state.games.rooms[`${id}`].messages
+  );
+  const [showForm, setShowForm] = useState(!!stamMessages.length);
+  const onStartButtonClicked = (text: string) => {
+    setShowCanvas(true);
+  };
+  console.log("word: room ", word);
   useEffect(() => {
-    socket.emit(EVENTS.CLIENT.JOIN_ROOM, currentRoom);
-
-    if (!currentRoom) {
-      setCurrentRoom(id);
-    }
-  }, []);
-  useEffect(() => {
-    if (currentRoom && allRooms) {
-      setMeesages(allRooms[currentRoom].messages);
-    }
-
+    // socket.emit(EVENTS.CLIENT.JOIN_ROOM, currentRoom);
     socket.on(
       EVENTS.SERVER.ROOM_MESSAGE,
       ({
@@ -51,6 +89,7 @@ const Room = () => {
         contentType,
         sendTime,
         messageId,
+        wordLength,
       }: Message) => {
         const date = new Date();
         const receiveTime = `${date.getFullYear()}-${date.getHours()}:${date.getMinutes()}`;
@@ -62,17 +101,19 @@ const Room = () => {
             contentType,
             sendTime,
             receiveTime,
+            wordLength,
             messageId,
           })
         );
       }
     );
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("pong");
-    };
-  }, [socket]);
+    socket.on(EVENTS.SERVER.RIGHT_GUESS, () => {
+      alert("right Guess");
+    });
+    socket.on(EVENTS.SERVER.BAD_GUESS, () => {
+      alert("Wrong Guess");
+    });
+  }, []);
 
   const updateRooms = (data: any) => {
     dispatch(setRooms(data));
@@ -88,13 +129,7 @@ const Room = () => {
     socket.on(EVENTS.SERVER.JOINED_ROOM, (roomId: string) => {
       updateRoomId(roomId);
     });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("pong");
-    };
-  }, [socket]);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value);
@@ -102,32 +137,46 @@ const Room = () => {
 
   return (
     <div>
-      {!messages && (
+      {!stamMessages && (
         <button onClick={() => setShowForm(!showForm)}>Create new Task</button>
       )}
-      {!showForm && <GameStarter />}
-      {messages.length === 0 ? (
-        <Canvas />
-      ) : messages.length === 1 ? (
-        <WordGuess
-          handleChange={handleChange}
-          value={word}
-          img={messages[0].content}
-        />
+      {!stamMessages.length && (
+        <div>
+          {!showForm && (
+            <GameStarter
+              onClick={onStartButtonClicked}
+              onWordGenerated={(val: string) => {
+                setWord(val);
+              }}
+            />
+          )}
+          {showCanvas && <Canvas word={word} />}
+        </div>
+      )}
+      {/* {!showForm && <GameStarter />} */}
+      {stamMessages.length === 1 ? (
+        <>
+          <WordGuess
+            handleChange={handleChange}
+            img={stamMessages[0].content}
+            wordLength={stamMessages[0].wordLength}
+          />
+        </>
       ) : null}
-
-      {messages.map(
-        ({ contentType, content, sendTime, receiveTime, messageId }: Message) =>
+      {/* <Canvas /> */}
+      {/* {stamMessages.map(
+        (
+          { contentType, content, sendTime, receiveTime, messageId }: Message,
+          index: number
+        ) =>
           contentType === "image" ? (
-            <div>
+            <div key={`${messageId}-${index}`}>
               <img src={content} key={messageId} alt={contentType} />
               <div>send time: {sendTime}</div>
               <div>receiv time: {receiveTime}</div>
             </div>
-          ) : (
-            <div></div>
-          )
-      )}
+          ) : null
+      )} */}
     </div>
   );
 };

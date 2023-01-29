@@ -9,6 +9,7 @@ export interface Message {
   receiveTime: string;
   contentType: string;
   messageId: string;
+  wordLength?: number;
 }
 
 export interface Room {
@@ -16,6 +17,7 @@ export interface Room {
   messages: Message[];
   roomId: string;
   createTime: string;
+  wordLength?: string;
 }
 
 export const Rooms: Record<string, Room> = {};
@@ -23,6 +25,7 @@ export const Rooms: Record<string, Room> = {};
 export interface CanvasSizeProps {
   width: number;
   height: number;
+  word?: string;
 }
 
 export interface Coordinate {
@@ -36,6 +39,7 @@ export interface CanvasPaintProps {
   lineJoin: CanvasLineJoin;
   height?: number;
   width?: number;
+  word?: string;
 }
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -65,7 +69,7 @@ export interface CanvasProps {
 export interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {}
 
 export interface SocketState {
-  rooms?: any;
+  rooms: Record<string, Room>;
   username?: string | null;
   userId?: string | null;
   roomId?: string;

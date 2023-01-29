@@ -5,7 +5,7 @@ import { COLOR_OPTIONS, LINE_JOIN_OPTIONS } from "../config";
 import Input from "./form/Input";
 import { CanvasSizeProps } from "../utils/interfaces";
 
-const CanvasContext = ({ width, height }: CanvasSizeProps) => {
+const CanvasContext = ({ width, height, word }: CanvasSizeProps) => {
   const [lineWidth, setLineWidth] = useState<number>(0.5);
   const [strokeColor, setStrokeColor] = useState<string>("gdfgdfreen");
   const [lineJoin, setLineJoin] = useState<CanvasLineJoin>("miter");
@@ -54,6 +54,7 @@ const CanvasContext = ({ width, height }: CanvasSizeProps) => {
         lineJoin={lineJoin as CanvasLineJoin}
         strokeColor={strokeColor}
         lineWidth={lineWidth}
+        word={word}
       />
     </div>
   );

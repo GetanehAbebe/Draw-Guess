@@ -7,8 +7,10 @@ import {
   setRooms,
   setRoomId,
   socketContext,
+  addMessage,
 } from "../app/gamesSlice";
 import { Link } from "react-router-dom";
+import { Message } from "../utils/interfaces";
 
 function RoomsContainer() {
   const rooms = useAppSelector(socketRooms);
@@ -17,31 +19,25 @@ function RoomsContainer() {
 
   const [roomName, setRoomName] = useState("");
 
-  useEffect(() => {
-    window.onfocus = function () {
-      document.title = "Chat app";
-    };
-  }, []);
+  // useEffect(() => {
+  //   window.onfocus = function () {
+  //     document.title = "Chat app";
+  //   };
+  // }, []);
 
   useEffect(() => {
     socket.on(EVENTS.SERVER.ROOMS, (data: any) => {
       dispatch(setRooms(data));
     });
-    socket.on(EVENTS.SERVER.JOINED_ROOM, (roomId: any) => {
-      dispatch(setRoomId(roomId));
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("pong");
-    };
-  }, [dispatch, socket]);
+    
+    return () => {};
+  }, []);
 
   function handleCreateRoom(name: string) {
     if (!String(roomName).trim()) return;
 
     socket.emit(EVENTS.CLIENT.CREATE_ROOM, { roomName, messages: [] });
+
     // set room name input to empty string
     if (roomName) {
       setRoomName("");
@@ -70,9 +66,9 @@ function RoomsContainer() {
           Object.keys(rooms).map((key) => {
             return (
               <div key={key}>
-                <div onClick={() => handleJoinRoom(key)}>
-                  <Link to={`/room/${key}`}>{rooms[key].name}</Link>
-                </div>
+                {/* <div onClick={() => handleJoinRoom(key)}> */}
+                <Link to={`/room/${key}`}>{rooms[key].name}</Link>
+                {/* </div> */}
               </div>
             );
           })}

@@ -7,7 +7,7 @@ import { Message, Room, SocketState } from "../utils/interfaces";
 const socket = io(SOCKET_URL);
 
 const initialState: SocketState = {
-  username: localStorage.getItem("username"),
+  username: localStorage.getItem("username") || "",
   socket,
   rooms: {},
 };
@@ -17,33 +17,52 @@ export const gamesSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<Message>) => {
-      const { content, contentType, sendTime, receiveTime, roomId, messageId } =
-        action.payload;
-      state.rooms[roomId].messages.push({
+      const {
         content,
         contentType,
         sendTime,
         receiveTime,
+        roomId,
         messageId,
-      });
+        wordLength,
+        username,
+      } = action.payload;
+      //
+      if (state.rooms[roomId]) {
+        state.rooms[roomId].messages.push({
+          content,
+          contentType,
+          sendTime,
+          receiveTime,
+          messageId,
+          roomId,
+          username,
+          wordLength,
+        });
+      }
+      return;
     },
-    setRooms: (state, action: PayloadAction<Room[]>) => {
+    setRooms: (state, action: PayloadAction<Record<string, Room>>) => {
       state.rooms = action.payload;
+      return;
     },
     setUsername: (state, { payload }) => {
       if (payload) {
         state.username = payload;
         localStorage.setItem("username", payload);
       }
+      return;
     },
     setUserId: (state, { payload }) => {
       if (payload) {
         state.userId = payload;
         localStorage.setItem("userId", payload);
       }
+      return;
     },
     setRoomId: (state, { payload }) => {
       state.roomId = payload;
+      return;
     },
   },
 });

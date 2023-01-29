@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import drawLine from "../../utils/drawLine";
-import { roomId, socketContext } from "../../app/gamesSlice";
+import { socketContext } from "../../app/gamesSlice";
 import { useAppSelector } from "../../app/hooks";
 import Button from "../form/Button";
 import { username } from "../../app/gamesSlice";
 import EVENTS from "../../config/events";
 import { Coordinate, CanvasPaintProps } from "../../utils/interfaces";
+import { useParams } from "react-router-dom";
 
 const Canvas = ({
   width,
@@ -13,15 +14,17 @@ const Canvas = ({
   lineJoin,
   lineWidth,
   strokeColor,
+  word,
 }: CanvasPaintProps) => {
   const currentUser = useAppSelector(username);
   const socket = useAppSelector(socketContext);
-  const currentRoom = useAppSelector(roomId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPainting, setIsPainting] = useState(false);
   const [mousePosition, setMousePosition] = useState<Coordinate | undefined>(
     undefined
   );
+
+  const { id } = useParams();
 
   const startPaint = useCallback((event: MouseEvent) => {
     const coordinates = getCoordinates(event);
@@ -101,7 +104,6 @@ const Canvas = ({
       y: event.pageY - canvas.offsetTop,
     };
   };
-
   return (
     <div>
       <div style={{ width: "50vw", height: "50vh", border: "red 10px solid" }}>
@@ -114,7 +116,8 @@ const Canvas = ({
               content: canvasRef.current.toDataURL("image/png", 1.0),
               contentType: "image",
               username: currentUser,
-              roomId: currentRoom,
+              roomId: id,
+              word,
             });
           }
         }}
