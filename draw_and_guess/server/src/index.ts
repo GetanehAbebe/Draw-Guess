@@ -3,7 +3,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { SERVER_PORT, SERVER_HOST } from "./config";
 import socket from "./socket";
-
+import cors from "cors";
 const app = express();
 
 const httpServer = createServer(app);
@@ -14,7 +14,7 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
-
+app.use(cors());
 app.get("/", (_, res) => res.send(`Server is up and running version `));
 
 httpServer.listen(SERVER_PORT, +SERVER_HOST, () => {
