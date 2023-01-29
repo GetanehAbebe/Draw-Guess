@@ -1,6 +1,6 @@
 # Stack:
   - Client:
-    - React, redux, Socket.io, Styled-components
+    - React, Redux, Socket.io, Styled-components
   - Server:
     - Node.js, Socket.io
   ----Typescript-----
