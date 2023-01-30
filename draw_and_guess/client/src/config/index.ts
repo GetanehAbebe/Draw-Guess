@@ -1,4 +1,5 @@
-export const SOCKET_URL = process.env.SOCKET_URL || "localhost:5000";
+export const SOCKET_URL =
+  process.env.SOCKET_URL || "draw-guess-xoji.vercel.app";
 export const COLOR_OPTIONS = [
   "Black",
   "Red",
