@@ -21,6 +21,7 @@ const io = new Server(httpServer, {
     origin: ["*", "https://draw-guess-brown.vercel.app"],
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
+    allowedHeaders: ["Access-Control-Allow-Origin"],
   },
   allowEIO3: true,
 });
