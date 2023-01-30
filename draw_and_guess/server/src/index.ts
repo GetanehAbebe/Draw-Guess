@@ -13,6 +13,7 @@ app.use(cors({ origin: "*" }));
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
+    methods: ["POST", "PUT", "GET", "DELETE"],
   },
 });
 
