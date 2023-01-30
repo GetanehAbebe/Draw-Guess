@@ -73,6 +73,7 @@ function socket(_a) {
         socket.on(EVENTS.CLIENT.SEND_GUESS, function (_a) {
             var roomId = _a.roomId, word = _a.word;
             if (rooms[roomId].word.toLocaleLowerCase() === word.toLocaleLowerCase()) {
+                console.log("log");
                 socket.emit(EVENTS.SERVER.RIGHT_GUESS, { roomId: roomId });
             }
             else {
