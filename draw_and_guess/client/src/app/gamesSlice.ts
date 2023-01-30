@@ -4,7 +4,12 @@ import { SOCKET_URL } from "../config";
 import io from "socket.io-client";
 import { Message, Room, SocketState } from "../utils/interfaces";
 
-const socket = io(SOCKET_URL);
+const socket = io(SOCKET_URL, {
+  withCredentials: true,
+  extraHeaders: {
+    "Access-Control-Allow-Origin": "*",
+  },
+});
 
 const initialState: SocketState = {
   username: localStorage.getItem("username") || "",
