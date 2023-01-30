@@ -20,7 +20,7 @@
     - Run command 'npm run start'
     - Go to server directory
     - Run command 'npm i'
-    - Run command 'npm run dev'
+    - Run command 'npm run start'
   
   #Me:
     - I would like to get feedbacks, suggestions and other comments, so if you have something please write,
