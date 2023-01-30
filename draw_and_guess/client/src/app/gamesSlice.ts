@@ -9,9 +9,9 @@ const socket = io(SOCKET_URL, {
   extraHeaders: {
     "Access-Control-Allow-Origin": "*",
   },
+  autoConnect: true,
 });
 
-socket.connect();
 const initialState: SocketState = {
   username: localStorage.getItem("username") || "",
   socket,

@@ -26,6 +26,10 @@ function RoomsContainer() {
   // }, []);
 
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
     socket.on(EVENTS.SERVER.ROOMS, (data: any) => {
       dispatch(setRooms(data));
     });
