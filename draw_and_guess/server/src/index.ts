@@ -18,11 +18,13 @@ app.use(
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://draw-guess-brown.vercel.app",
+    origin: ["*", "https://draw-guess-brown.vercel.app"],
     credentials: true,
     methods: ["GET", "PUT", "POST", "DELETE"],
   },
+  allowEIO3: true,
 });
+
 app.get("/", (_, res) =>
   res.send(`Server is up and running version, ${SERVER_HOST} `)
 );
