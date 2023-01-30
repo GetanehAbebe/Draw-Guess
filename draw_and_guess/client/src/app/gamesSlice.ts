@@ -11,6 +11,7 @@ const socket = io(SOCKET_URL, {
   },
 });
 
+socket.connect();
 const initialState: SocketState = {
   username: localStorage.getItem("username") || "",
   socket,
