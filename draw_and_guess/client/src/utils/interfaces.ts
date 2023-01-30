@@ -66,13 +66,39 @@ export interface CanvasProps {
   height: number;
 }
 
-export interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {}
+export interface ButtonProps extends React.HTMLProps<HTMLButtonElement> {
+  backgroundColor?: string;
+  color?: string;
+  cursor?: string;
+  width?: string;
+  height?: string;
+  padding?: string;
+  borderRadius?: string;
+  border?: string;
+  bold?: boolean;
+  fontSize?: string;
+}
+
+export interface FlexProps {
+  justifyContent?: string;
+  direction?: string;
+  wrap?: string;
+  grow?: number;
+  flow?: string;
+  shrink?: number;
+  basis?: string;
+  order?: string;
+  flex?: string;
+  children?: any;
+  width?: string;
+  height?: string;
+}
 
 export interface SocketState {
   rooms: Record<string, Room>;
   username?: string | null;
   userId?: string | null;
-  roomId?: string;
+  roomId: string;
   socket: Socket;
 }
 

@@ -8,22 +8,12 @@ const app = express();
 
 const httpServer = createServer(app);
 
-app.use(
-  cors({
-    origin: ["https://draw-guess-brown.vercel.app"],
-    credentials: true,
-    methods: ["GET", "PUT", "POST", "DELETE"],
-  })
-);
+app.use(cors({ origin: "*" }));
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ["*", "https://draw-guess-brown.vercel.app"],
-    credentials: true,
-    methods: ["GET", "PUT", "POST", "DELETE"],
-    allowedHeaders: ["Access-Control-Allow-Origin"],
+    origin: "*",
   },
-  allowEIO3: true,
 });
 
 app.get("/", (_, res) =>

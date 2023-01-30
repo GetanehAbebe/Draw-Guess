@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Flex from "./Flex";
 
 interface Props {
   drawing: string;
@@ -9,7 +10,7 @@ const GuessingView: React.FC<Props> = ({ drawing }) => {
   const [imgUrl, setImgUrl] = useState("");
 
   return (
-    <div>
+    <Flex direction="column">
       <h2>Guess the word:</h2>
       <img
         src={imgUrl}
@@ -20,9 +21,7 @@ const GuessingView: React.FC<Props> = ({ drawing }) => {
           border: "blue 10px solid",
         }}
       />
-      {/* <input type="text" onChange={handleGuessChange} value={guess} />
-      <button onClick={handleSubmitClick}>Submit</button> */}
-    </div>
+    </Flex>
   );
 };
 

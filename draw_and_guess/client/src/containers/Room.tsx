@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { rooms, setRoomId, setRooms, socketContext } from "../app/gamesSlice";
+import { setRoomId, setRooms, socketContext } from "../app/gamesSlice";
 import Canvas from "../components/CanvasContext";
-import { roomId } from "../app/gamesSlice";
 import GameStarter from "../components/GameStarter";
 import EVENTS from "../config/events";
 import { addMessage } from "../app/gamesSlice";
 import { Message } from "../utils/interfaces";
 import { useParams } from "react-router-dom";
 import Input from "../components/form/Input";
+import Button from "../components/form/Button";
+import Flex from "../components/Flex";
 
 const WordGuess = ({ img, wordLength }: any) => {
   const socket = useAppSelector(socketContext);
   const [guessedWord, setGuessedWord] = useState("");
-  const currentRoom = useState(useAppSelector(roomId));
-  const { id: currentRoomId } = useParams();
+  const { id } = useParams();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (wordLength >= e.target.value.length) {
       setGuessedWord(e.target.value);
@@ -36,31 +36,37 @@ const WordGuess = ({ img, wordLength }: any) => {
   // }, [socket]);
 
   return (
-    <div>
+    <Flex direction="column">
       Please try guess this Draw.
       <div>clue : The word Length is : {wordLength}</div>
       <div>
         <img src={img} alt="" />
       </div>
-      <Input
-        onChange={handleChange}
-        name="Guess Word"
-        label="Guess Word "
-        type="text"
-        value={guessedWord}
-      />
-      <button
-        disabled={wordLength !== guessedWord.length}
-        onClick={() => {
-          socket.emit(EVENTS.CLIENT.SEND_GUESS, {
-            roomId: currentRoomId,
-            word: guessedWord,
-          });
-        }}
-      >
-        Guess
-      </button>
-    </div>
+      <Flex direction="column" width="50%">
+        <Input
+          onChange={handleChange}
+          name="Guess Word"
+          label="Guess Word: "
+          type="text"
+          value={guessedWord}
+        />
+        <Button
+          disabled={wordLength !== guessedWord.length}
+          onClick={() => {
+            socket.emit(EVENTS.CLIENT.SEND_GUESS, {
+              roomId: id,
+              word: guessedWord,
+            });
+          }}
+          padding="5px"
+          bold
+          fontSize="26px"
+          backgroundColor={wordLength !== guessedWord.length ? "gray" : "cyan"}
+        >
+          Send guess
+        </Button>
+      </Flex>
+    </Flex>
   );
 };
 
@@ -77,7 +83,6 @@ const Room = () => {
   const onStartButtonClicked = (text: string) => {
     setShowCanvas(true);
   };
-  console.log("word: room ", word);
   useEffect(() => {
     socket.emit(EVENTS.CLIENT.JOIN_ROOM, id);
     socket.on(
@@ -119,15 +124,15 @@ const Room = () => {
     dispatch(setRooms(data));
   };
 
-  const updateRoomId = (id: string) => {
-    dispatch(setRoomId(roomId));
+  const updateRoomId = () => {
+    dispatch(setRoomId(id));
   };
   useEffect(() => {
     socket.on(EVENTS.SERVER.ROOMS, (data: any) => {
       updateRooms(data);
     });
-    socket.on(EVENTS.SERVER.JOINED_ROOM, (roomId: string) => {
-      updateRoomId(roomId);
+    socket.on(EVENTS.SERVER.JOINED_ROOM, () => {
+      updateRoomId();
     });
   }, []);
 
@@ -138,7 +143,7 @@ const Room = () => {
   return (
     <div>
       {!stamMessages && (
-        <button onClick={() => setShowForm(!showForm)}>Create new Task</button>
+        <Button onClick={() => setShowForm(!showForm)}>Create new Task</Button>
       )}
       {!stamMessages.length && (
         <div>

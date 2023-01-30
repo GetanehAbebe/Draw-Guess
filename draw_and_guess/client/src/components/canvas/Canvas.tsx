@@ -121,8 +121,11 @@ const Canvas = ({
             });
           }
         }}
+        padding="7px"
+        bold
+        
       >
-        Save
+        Send draw
       </Button>
     </div>
   );

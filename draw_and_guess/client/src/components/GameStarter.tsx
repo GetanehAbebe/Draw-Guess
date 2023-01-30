@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import randomWords from "random-words";
+import Button from "./form/Button";
 const GameStarter = ({
   onClick,
   onWordGenerated,
@@ -35,13 +36,13 @@ const GameStarter = ({
       )}
       <div>
         {canChooseWord && (
-          <button onClick={fetchWord}>
+          <Button onClick={fetchWord}>
             {word ? "Generate another Word" : "Generate Word"}
-          </button>
+          </Button>
         )}
       </div>
       {canChooseWord && word && (
-        <button onClick={onStartButtonClicked}>Start</button>
+        <Button onClick={onStartButtonClicked}>Start</Button>
       )}
     </div>
   );

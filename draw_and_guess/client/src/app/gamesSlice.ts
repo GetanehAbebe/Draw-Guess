@@ -4,18 +4,13 @@ import { SOCKET_URL } from "../config";
 import io from "socket.io-client";
 import { Message, Room, SocketState } from "../utils/interfaces";
 
-const socket = io(SOCKET_URL, {
-  withCredentials: true,
-  extraHeaders: {
-    "Access-Control-Allow-Origin": "*",
-  },
-  autoConnect: true,
-});
+const socket = io(SOCKET_URL);
 
 const initialState: SocketState = {
   username: localStorage.getItem("username") || "",
   socket,
   rooms: {},
+  roomId: "",
 };
 
 export const gamesSlice = createSlice({
@@ -75,7 +70,8 @@ export const gamesSlice = createSlice({
 export const rooms = (state: RootState) => state.games.rooms;
 export const username = (state: RootState) => state.games.username;
 export const userId = (state: RootState) => state.games.userId;
-export const roomId = (state: RootState) => state.games.roomId;
+export const roomId = (state: RootState) => state.games.roomId || 0;
+
 export const socketContext = (state: RootState) => state.games.socket;
 
 export const { addMessage, setRooms, setUsername, setUserId, setRoomId } =
