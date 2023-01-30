@@ -79,7 +79,7 @@ const Room = () => {
   };
   console.log("word: room ", word);
   useEffect(() => {
-    // socket.emit(EVENTS.CLIENT.JOIN_ROOM, currentRoom);
+    socket.emit(EVENTS.CLIENT.JOIN_ROOM, id);
     socket.on(
       EVENTS.SERVER.ROOM_MESSAGE,
       ({
@@ -163,20 +163,6 @@ const Room = () => {
           />
         </>
       ) : null}
-      {/* <Canvas /> */}
-      {/* {stamMessages.map(
-        (
-          { contentType, content, sendTime, receiveTime, messageId }: Message,
-          index: number
-        ) =>
-          contentType === "image" ? (
-            <div key={`${messageId}-${index}`}>
-              <img src={content} key={messageId} alt={contentType} />
-              <div>send time: {sendTime}</div>
-              <div>receiv time: {receiveTime}</div>
-            </div>
-          ) : null
-      )} */}
     </div>
   );
 };
