@@ -23,7 +23,9 @@ var io = new socket_io_1.Server(httpServer, {
         methods: ["GET", "PUT", "POST", "DELETE"],
     },
 });
-app.get("/", function (_, res) { return res.send("Server is up and running version "); });
+app.get("/", function (_, res) {
+    return res.send("Server is up and running version, ".concat(config_1.SERVER_HOST, " "));
+});
 httpServer.listen(config_1.SERVER_PORT, +config_1.SERVER_HOST, function () {
     console.log("server started on port ".concat(config_1.SERVER_PORT));
     (0, socket_1.default)({ io: io });
